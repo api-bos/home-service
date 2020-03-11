@@ -9,9 +9,9 @@
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>com.bos</groupId>
-	<artifactId>home</artifactId>
+	<artifactId>home-service</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>home</name>
+	<name>home-service</name>
 	<description>Home Service for BOS Project</description>
 
 	<properties>
