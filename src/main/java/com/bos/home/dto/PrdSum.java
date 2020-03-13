@@ -12,8 +12,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonNaming(PropertyNamingStrategy.SnakeCaseStrategy.class)
-public class TrxSum {
-    private String sumTrx;
+public class PrdSum {
+    private String productName;
 
-    private String nomTrx;
+    private Integer qty;
 }
