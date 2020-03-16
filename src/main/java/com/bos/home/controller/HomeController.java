@@ -93,5 +93,19 @@ public class HomeController {
 
     }
 
-    
+    @GetMapping(value = "/byr", params = "seller", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResultEntity<List<PrdSum>> getBuyer(@RequestParam("seller") Integer idSeller){
+        try{
+            System.out.println("Try Get Sum Byr");
+            System.out.println("seller: " + idSeller);
+
+            ResultEntity hasil = services.getBuyer(idSeller);
+            System.out.println("Request Succeeded");
+            return hasil;
+        }
+        catch (Exception ex){
+            ex.printStackTrace();
+            return new ResultEntity<>(null, ErrorCode.BIT_999);
+        }
+    }
 }

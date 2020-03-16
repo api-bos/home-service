@@ -2,6 +2,7 @@ package com.bos.home.service;
 
 import bca.bit.proj.library.base.ResultEntity;
 import bca.bit.proj.library.enums.ErrorCode;
+import com.bos.home.dto.ByrSum;
 import com.bos.home.dto.PrdSum;
 import com.bos.home.dto.TrxSum;
 
@@ -122,25 +123,7 @@ public class HomeServices {
             System.out.println("Data is NULL");
             return new ResultEntity<>(prdSums, ErrorCode.BIT_999);
         }
-        /*
-        String[] prdSumArr = detailRepo.sumPrdByIdSeller(idSeller);
 
-        List<PrdSum> prdSumList = new ArrayList<>();
-
-        for(int i = 0; i < prdSumArr.length; i++){
-            String temp = prdSumArr[i];
-            String[] tempArr = temp.split(",");
-            PrdSum prdSum = new PrdSum();
-            prdSum.setProductName(tempArr[0]);
-            prdSum.setQty(tempArr[1]);
-            prdSumList.add(prdSum);
-        }
-
-        if (prdSumList.isEmpty()){
-            return new ResultEntity<>(null, ErrorCode.BIT_999);
-        }else return new ResultEntity<>(prdSumList, ErrorCode.BIT_000);
-
-         */
     }
 
     public ResultEntity<List<PrdSum>> getSumPrdByDate(Integer idSeller, String startDt, String endDt){
@@ -195,5 +178,25 @@ public class HomeServices {
          */
     }
 
+    public ResultEntity<List<ByrSum>> getBuyer(Integer idSeller){
+        String query = "select b.buyer_name as name, b.phone as mobileNum, count(t.id_buyer) as sumTrx\n" +
+                "from transaction t\n" +
+                "left join buyer b on t.id_buyer = b.id_buyer \n" +
+                "where t.id_seller = "+idSeller+" AND date_part('day',current_date() - payment_time) <= 30\n" +
+                "group by b.buyer_name, b.phone \n" +
+                "order by count(t.id_buyer) desc";
 
+        List<ByrSum> data = jdbcTemplate.query(query, new BeanPropertyRowMapper<>(ByrSum.class));
+        System.out.println("Query Success");
+
+        if(data.size() > 0){
+            System.out.println("Data is not NULL");
+            return new ResultEntity<>(data, ErrorCode.BIT_000);
+        }
+        else
+        {
+            System.out.println("Data is NULL");
+            return new ResultEntity<>(data, ErrorCode.BIT_999);
+        }
+    }
 }
