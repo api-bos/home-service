@@ -13,7 +13,11 @@ import lombok.NoArgsConstructor;
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonNaming(PropertyNamingStrategy.SnakeCaseStrategy.class)
 public class PrdSum {
+    private Integer idProduct;
+
     private String productName;
+
+    private String imagePath;
 
     private Integer qty;
 }

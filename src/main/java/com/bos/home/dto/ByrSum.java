@@ -13,9 +13,11 @@ import lombok.NoArgsConstructor;
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonNaming(PropertyNamingStrategy.SnakeCaseStrategy.class)
 public class ByrSum {
-    private String name;
+    private Integer idBuyer;
 
-    private String mobileNum;
+    private String buyerName;
+
+    private String phone;
 
     private Integer sumTrx;
 }
