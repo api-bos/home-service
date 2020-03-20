@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping(path = "/home")
+@RequestMapping(path = "/bos/home")
 @CrossOrigin(origins = "*")
 public class HomeController {
     @Autowired
@@ -107,5 +107,42 @@ public class HomeController {
             ex.printStackTrace();
             return new ResultEntity<>(null, ErrorCode.BIT_999);
         }
+    }
+
+    @GetMapping(value = "/tgraph", params = "seller", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResultEntity<TrxSum> getTrxGraph(@RequestParam("seller") Integer idSeller){
+        try{
+            System.out.println("Try Get Trx Graph");
+            System.out.println("seller: " + idSeller);
+
+            ResultEntity hasil = services.getTrxGraph(idSeller);
+            System.out.println("Request Succeeded");
+            return hasil;
+        }
+        catch (Exception ex){
+            ex.printStackTrace();
+            return new ResultEntity<>(null, ErrorCode.BIT_999);
+        }
+    }
+
+    @GetMapping(value = "/tgraph", params = {"seller", "start-dt", "end-dt"}, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResultEntity<TrxSum> getTrxGraphByDate(@RequestParam("seller") Integer idSeller,
+                                                @RequestParam("start-dt") String startDt,
+                                                @RequestParam("end-dt") String endDt){
+        try {
+            System.out.println("Try Get Trx Graph by Date");
+            System.out.println("seller: " + idSeller);
+            System.out.println("start-dt: " + startDt);
+            System.out.println("end-dt: " + endDt);
+
+            ResultEntity hasil = services.getTrxGraphByDate(idSeller,startDt,endDt);
+            System.out.println("Request Succeeded");
+            return hasil;
+        }
+        catch (Exception ex){
+            ex.printStackTrace();
+            return new ResultEntity<>(null, ErrorCode.BIT_999);
+        }
+
     }
 }

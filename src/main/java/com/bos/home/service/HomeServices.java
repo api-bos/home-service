@@ -4,6 +4,7 @@ import bca.bit.proj.library.base.ResultEntity;
 import bca.bit.proj.library.enums.ErrorCode;
 import com.bos.home.dto.ByrSum;
 import com.bos.home.dto.PrdSum;
+import com.bos.home.dto.TrxGraph;
 import com.bos.home.dto.TrxSum;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,36 +36,14 @@ public class HomeServices {
             System.out.println("Data is NULL");
             return new ResultEntity<>(data, ErrorCode.BIT_999);
         }
-
-        /*
-        String[] trxSumArr = trxRepo.sumByIdSeller(idSeller);
-        String temp = trxSumArr[0];
-        String tempArr[] = temp.split(",");
-
-        TrxSum trxSum = new TrxSum();
-        trxSum.setSumTrx(tempArr[0]);
-        trxSum.setNomTrx(tempArr[1]);
-
-        if (trxSum.equals(null)){
-            System.out.println("Failed");
-            return new ResultEntity<>(trxSum, ErrorCode.BIT_999);
-        }
-        else{
-            System.out.println("Success");
-            return new ResultEntity<>(trxSum, ErrorCode.BIT_000);
-        }
-
-         */
     }
 
     public ResultEntity<List<TrxSum>> getSumTrxByDate(Integer idSeller, String startDt, String endDt){
-        String sDt = startDt + " 00:00:00";
-        String eDt = endDt + " 23:59:59";
 
         String query = "select count(t.id_seller) as sumTrx, sum(t.total_payment) as nomTrx " +
                 "from transaction t " +
                 "where t.id_seller = "+idSeller+" AND " +
-                "confirmation_time between '"+sDt+"' and (date '"+eDt+"' + interval '1 day')";
+                "confirmation_time between '"+startDt+"' and (date '"+endDt+"' + interval '1 day')";
 
         List<TrxSum> data = jdbcTemplate.query(query, new BeanPropertyRowMapper<>(TrxSum.class));
 
@@ -77,26 +56,6 @@ public class HomeServices {
             System.out.println("Data is NULL");
             return new ResultEntity<>(data, ErrorCode.BIT_999);
         }
-
-        /*
-        String[] trxSumArr = trxRepo.sumByIdSellerAndDate(idSeller, sDt, eDt);
-        String temp = trxSumArr[0];
-        String tempArr[] = temp.split(",");
-
-        TrxSum trxSum = new TrxSum();
-        trxSum.setSumTrx(tempArr[0]);
-        trxSum.setNomTrx(tempArr[1]);
-
-        if (trxSum.equals(null)){
-            System.out.println("Failed");
-            return new ResultEntity<>(trxSum, ErrorCode.BIT_999);
-        }
-        else{
-            System.out.println("Success");
-            return new ResultEntity<>(trxSum, ErrorCode.BIT_000);
-        }
-
-         */
     }
 
     public ResultEntity<List<PrdSum>> getSumPrd(Integer idSeller){
@@ -127,8 +86,6 @@ public class HomeServices {
     }
 
     public ResultEntity<List<PrdSum>> getSumPrdByDate(Integer idSeller, String startDt, String endDt){
-        String sDt = startDt + " 00:00:00";
-        String eDt = endDt + " 23:59:59";
 
         String query = "select prd.id_product, prd.product_name, prd.image_path, SUM(td.quantity) as qty " +
                 "from transaction_detail td " +
@@ -137,7 +94,7 @@ public class HomeServices {
                 "in (select id_transaction " +
                     "from transaction " +
                     "where id_seller = " + idSeller +  " AND " +
-                    "confirmation_time between '"+sDt+"' and (date '"+eDt+"' + interval '1 day')) "+
+                    "confirmation_time between '"+startDt+"' and (date '"+endDt+"' + interval '1 day')) "+
                 "group by prd.id_product, prd.product_name " +
                 "order by sum(td.quantity) desc " +
                 "limit 5";
@@ -166,6 +123,49 @@ public class HomeServices {
 
         List<ByrSum> data = jdbcTemplate.query(query, new BeanPropertyRowMapper<>(ByrSum.class));
         System.out.println("Query Success");
+
+        if(data.size() > 0){
+            System.out.println("Data is not NULL");
+            return new ResultEntity<>(data, ErrorCode.BIT_000);
+        }
+        else
+        {
+            System.out.println("Data is NULL");
+            return new ResultEntity<>(data, ErrorCode.BIT_999);
+        }
+    }
+
+    public ResultEntity<List<TrxGraph>> getTrxGraph(Integer idSeller){
+        String query = "select to_char(date_trunc('month', t.confirmation_time), 'yyyy-mm') as date,\n" +
+                "sum(t.total_payment ) as nomTrx\n" +
+                "from transaction t\n" +
+                "where date_part('day',current_date() - confirmation_time) <= 30 AND t.id_seller = "+idSeller+"\n"+
+                "group by 1\n" +
+                "order by 1";
+
+        List<TrxGraph> data = jdbcTemplate.query(query, new BeanPropertyRowMapper<>(TrxGraph.class));
+
+        if(data.size() > 0){
+            System.out.println("Data is not NULL");
+            return new ResultEntity<>(data, ErrorCode.BIT_000);
+        }
+        else
+        {
+            System.out.println("Data is NULL");
+            return new ResultEntity<>(data, ErrorCode.BIT_999);
+        }
+    }
+
+    public ResultEntity<List<TrxGraph>> getTrxGraphByDate(Integer idSeller, String startDt, String endDt){
+        String query = "select to_char(date_trunc('month', t.confirmation_time), 'yyyy-mm') as date,\n" +
+                "sum(t.total_payment ) as nomTrx\n" +
+                "from transaction t\n" +
+                "where t.id_seller = "+idSeller+" AND\n" +
+                "t.confirmation_time between '"+startDt+"' and (date '"+endDt+"' + interval '1 day') \n" +
+                "group by 1\n" +
+                "order by 1";
+
+        List<TrxGraph> data = jdbcTemplate.query(query, new BeanPropertyRowMapper<>(TrxGraph.class));
 
         if(data.size() > 0){
             System.out.println("Data is not NULL");
