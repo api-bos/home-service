@@ -22,7 +22,7 @@ public class HomeServices {
     public ResultEntity<List<TrxSum>> getSumTrx(Integer idSeller){
         String query = "select count(t.id_seller) as sumTrx, sum(t.total_payment) as nomTrx " +
                 "from transaction t " +
-                "where date_part('day',current_date() - payment_time) <= 30 AND t.id_seller = "+idSeller;
+                "where date_part('day',current_date() - confirmation_time) <= 30 AND t.id_seller = "+idSeller;
 
         List<TrxSum> data = jdbcTemplate.query(query, new BeanPropertyRowMapper<>(TrxSum.class));
 
@@ -64,7 +64,7 @@ public class HomeServices {
         String query = "select count(t.id_seller) as sumTrx, sum(t.total_payment) as nomTrx " +
                 "from transaction t " +
                 "where t.id_seller = "+idSeller+" AND " +
-                "payment_time between '"+sDt+"' and (date '"+eDt+"' + interval '1 day')";
+                "confirmation_time between '"+sDt+"' and (date '"+eDt+"' + interval '1 day')";
 
         List<TrxSum> data = jdbcTemplate.query(query, new BeanPropertyRowMapper<>(TrxSum.class));
 
@@ -106,7 +106,7 @@ public class HomeServices {
                 "where td.id_transaction " +
                 "in (select id_transaction " +
                 "from transaction " +
-                "where id_seller= " + idSeller + " AND date_part('day',current_date() - payment_time) <= 30) " +
+                "where id_seller= " + idSeller + " AND date_part('day',current_date() - confirmation_time) <= 30) " +
                 "group by prd.id_product, prd.product_name " +
                 "order by sum(td.quantity) desc " +
                 "limit 5";
@@ -137,7 +137,7 @@ public class HomeServices {
                 "in (select id_transaction " +
                     "from transaction " +
                     "where id_seller = " + idSeller +  " AND " +
-                    "payment_time between '"+sDt+"' and (date '"+eDt+"' + interval '1 day')) "+
+                    "confirmation_time between '"+sDt+"' and (date '"+eDt+"' + interval '1 day')) "+
                 "group by prd.id_product, prd.product_name " +
                 "order by sum(td.quantity) desc " +
                 "limit 5";
@@ -160,7 +160,7 @@ public class HomeServices {
         String query = "select t.id_buyer as idBuyer, b.buyer_name as buyerName, b.phone, count(t.id_buyer) as sumTrx\n" +
                 "from transaction t\n" +
                 "left join buyer b on t.id_buyer = b.id_buyer \n" +
-                "where t.id_seller = "+idSeller+" AND date_part('day',current_date() - payment_time) <= 30\n" +
+                "where t.id_seller = "+idSeller+" AND date_part('day',current_date() - confirmation_time) <= 30\n" +
                 "group by t.id_buyer, b.buyer_name, b.phone \n" +
                 "order by count(t.id_buyer) desc";
 
