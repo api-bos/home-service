@@ -1,4 +1,5 @@
 com\bos\home\dto\ByrSum.class
+com\bos\home\dto\TrxGraph.class
 com\bos\home\service\HomeServices.class
 com\bos\home\dto\TrxSum.class
 com\bos\home\controller\HomeController.class
