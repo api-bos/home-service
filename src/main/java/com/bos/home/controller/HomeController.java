@@ -3,6 +3,7 @@ package com.bos.home.controller;
 import bca.bit.proj.library.base.ResultEntity;
 import bca.bit.proj.library.enums.ErrorCode;
 import com.bos.home.dto.PrdSum;
+import com.bos.home.dto.TrxGraph;
 import com.bos.home.dto.TrxSum;
 import com.bos.home.service.HomeServices;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -110,12 +111,12 @@ public class HomeController {
     }
 
     @GetMapping(value = "/tgraph", params = "seller", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResultEntity<TrxSum> getTrxGraph(@RequestParam("seller") Integer idSeller){
+    public ResultEntity<List<TrxGraph>> getTrxGraph(@RequestParam("seller") Integer idSeller){
         try{
             System.out.println("Try Get Trx Graph");
             System.out.println("seller: " + idSeller);
 
-            ResultEntity hasil = services.getTrxGraph(idSeller);
+            ResultEntity<List<TrxGraph>> hasil = services.getTrxGraph(idSeller);
             System.out.println("Request Succeeded");
             return hasil;
         }
@@ -126,7 +127,7 @@ public class HomeController {
     }
 
     @GetMapping(value = "/tgraph", params = {"seller", "start-dt", "end-dt"}, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResultEntity<TrxSum> getTrxGraphByDate(@RequestParam("seller") Integer idSeller,
+    public ResultEntity<List<TrxGraph>> getTrxGraphByDate(@RequestParam("seller") Integer idSeller,
                                                 @RequestParam("start-dt") String startDt,
                                                 @RequestParam("end-dt") String endDt){
         try {
@@ -135,7 +136,7 @@ public class HomeController {
             System.out.println("start-dt: " + startDt);
             System.out.println("end-dt: " + endDt);
 
-            ResultEntity hasil = services.getTrxGraphByDate(idSeller,startDt,endDt);
+            ResultEntity<List<TrxGraph>> hasil = services.getTrxGraphByDate(idSeller,startDt,endDt);
             System.out.println("Request Succeeded");
             return hasil;
         }
