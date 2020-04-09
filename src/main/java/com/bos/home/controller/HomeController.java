@@ -14,7 +14,6 @@ import java.util.List;
 
 @RestController
 @RequestMapping(path = "/bos/home")
-@CrossOrigin(origins = "*")
 public class HomeController {
     @Autowired
     HomeServices services;
