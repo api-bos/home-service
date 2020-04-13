@@ -4,4 +4,5 @@ com\bos\home\service\HomeServices.class
 com\bos\home\dto\TrxSum.class
 com\bos\home\controller\HomeController.class
 com\bos\home\dto\PrdSum.class
+com\bos\home\response\PrdSumResponse.class
 com\bos\home\HomeApplication.class

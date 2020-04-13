@@ -7,11 +7,18 @@ import com.bos.home.dto.PrdSum;
 import com.bos.home.dto.TrxGraph;
 import com.bos.home.dto.TrxSum;
 
+import com.bos.home.response.PrdSumResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Base64;
 import java.util.List;
 
 @Service
@@ -19,6 +26,35 @@ public class HomeServices {
 
     @Autowired
     JdbcTemplate jdbcTemplate;
+
+    public String encoder(String p_imagePath) {
+        String tmp_base64Image = "";
+        System.out.println(p_imagePath.substring(8));
+        String imagePath = "";
+
+        try {
+            imagePath = "\\NASBOS\\" + p_imagePath.substring(8);
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+
+        File tmp_file = new File(imagePath);
+        try (FileInputStream tmp_imageInFile = new FileInputStream(tmp_file)) {
+            // Reading a Image file from file system
+            byte tmp_imageData[] = new byte[(int) tmp_file.length()];
+            tmp_imageInFile.read(tmp_imageData);
+            tmp_base64Image = Base64.getEncoder().encodeToString(tmp_imageData);
+            return tmp_base64Image;
+
+        } catch (FileNotFoundException e) {
+            System.out.println("Image not found" + e);
+            return "";
+
+        } catch (IOException ioe) {
+            System.out.println("Exception while reading the Image " + ioe);
+            return "";
+        }
+    }
 
     public ResultEntity<List<TrxSum>> getSumTrx(Integer idSeller){
         String query = "select count(t.id_seller) as sumTrx, sum(t.total_payment) as nomTrx " +
@@ -58,7 +94,7 @@ public class HomeServices {
         }
     }
 
-    public ResultEntity<List<PrdSum>> getSumPrd(Integer idSeller){
+    public ResultEntity<List<PrdSumResponse>> getSumPrd(Integer idSeller){
         String query = "select prd.id_product, prd.product_name, prd.image_path, SUM(td.quantity) as qty " +
                 "from transaction_detail td " +
                 "left join product prd on td.id_product = prd.id_product " +
@@ -71,45 +107,78 @@ public class HomeServices {
                 "limit 5";
 
         List<PrdSum> prdSums = jdbcTemplate.query(query, new BeanPropertyRowMapper<>(PrdSum.class));
+        List<PrdSumResponse> prdSumResponseList = new ArrayList<>();
         System.out.println("Query Success");
 
         if(prdSums.size() > 0){
             System.out.println("Data is not NULL");
-            return new ResultEntity<>(prdSums, ErrorCode.BIT_000);
+
+            for (int i=0; i<prdSums.size(); i++) {
+                int tmp_idProduct = prdSums.get(i).getIdProduct();
+                String tmp_productName = prdSums.get(i).getProductName();
+                String tmp_base64StringImage = encoder(prdSums.get(i).getImagePath());
+                int tmp_quantity = prdSums.get(i).getQty();
+
+                PrdSumResponse tmp_prdSumResponse = new PrdSumResponse();
+                tmp_prdSumResponse.setIdProduct(tmp_idProduct);
+                tmp_prdSumResponse.setProductName(tmp_productName);
+                tmp_prdSumResponse.setBase64StringImage(tmp_base64StringImage);
+                tmp_prdSumResponse.setQty(tmp_quantity);
+
+                prdSumResponseList.add(tmp_prdSumResponse);
+            }
+
+            return new ResultEntity<>(prdSumResponseList, ErrorCode.BIT_000);
         }
         else
         {
             System.out.println("Data is NULL");
-            return new ResultEntity<>(prdSums, ErrorCode.BIT_999);
+            return new ResultEntity<>(prdSumResponseList, ErrorCode.BIT_999);
         }
 
     }
 
-    public ResultEntity<List<PrdSum>> getSumPrdByDate(Integer idSeller, String startDt, String endDt){
+    public ResultEntity<List<PrdSumResponse>> getSumPrdByDate(Integer idSeller, String startDt, String endDt){
 
         String query = "select prd.id_product, prd.product_name, prd.image_path, SUM(td.quantity) as qty " +
                 "from transaction_detail td " +
                 "left join product prd on td.id_product = prd.id_product " +
                 "where td.id_transaction " +
                 "in (select id_transaction " +
-                    "from transaction " +
-                    "where id_seller = " + idSeller +  " AND " +
-                    "confirmation_time between '"+startDt+"' and (date '"+endDt+"' + interval '1 day')) "+
+                "from transaction " +
+                "where id_seller = " + idSeller +  " AND " +
+                "confirmation_time between '"+startDt+"' and (date '"+endDt+"' + interval '1 day')) "+
                 "group by prd.id_product, prd.product_name " +
                 "order by sum(td.quantity) desc " +
                 "limit 5";
 
         List<PrdSum> prdSums = jdbcTemplate.query(query, new BeanPropertyRowMapper<>(PrdSum.class));
+        List<PrdSumResponse> prdSumResponseList = new ArrayList<>();
         System.out.println("Query Success");
 
         if(prdSums.size() > 0){
             System.out.println("Data is not NULL");
-            return new ResultEntity<>(prdSums, ErrorCode.BIT_000);
+
+            for (int i=0; i<prdSums.size(); i++) {
+                int tmp_idProduct = prdSums.get(i).getIdProduct();
+                String tmp_productName = prdSums.get(i).getProductName();
+                String tmp_base64StringImage = encoder(prdSums.get(i).getImagePath());
+                int tmp_quantity = prdSums.get(i).getQty();
+
+                PrdSumResponse tmp_prdSumResponse = new PrdSumResponse();
+                tmp_prdSumResponse.setIdProduct(tmp_idProduct);
+                tmp_prdSumResponse.setProductName(tmp_productName);
+                tmp_prdSumResponse.setBase64StringImage(tmp_base64StringImage);
+                tmp_prdSumResponse.setQty(tmp_quantity);
+
+                prdSumResponseList.add(tmp_prdSumResponse);
+            }
+            return new ResultEntity<>(prdSumResponseList, ErrorCode.BIT_000);
         }
         else
         {
             System.out.println("Data is NULL");
-            return new ResultEntity<>(prdSums, ErrorCode.BIT_999);
+            return new ResultEntity<>(prdSumResponseList, ErrorCode.BIT_999);
         }
     }
 

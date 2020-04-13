@@ -5,6 +5,7 @@ import bca.bit.proj.library.enums.ErrorCode;
 import com.bos.home.dto.PrdSum;
 import com.bos.home.dto.TrxGraph;
 import com.bos.home.dto.TrxSum;
+import com.bos.home.response.PrdSumResponse;
 import com.bos.home.service.HomeServices;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -57,7 +58,7 @@ public class HomeController {
 
 
     @GetMapping(value = "/prd", params = "seller", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResultEntity<List<PrdSum>> getPrdSum(@RequestParam("seller") Integer idSeller){
+    public ResultEntity<List<PrdSumResponse>> getPrdSum(@RequestParam("seller") Integer idSeller){
         try{
             System.out.println("Try Get Sum Prd");
             System.out.println("seller: " + idSeller);
@@ -73,9 +74,9 @@ public class HomeController {
     }
 
     @GetMapping(value = "/prd", params = {"seller", "start-dt", "end-dt"}, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResultEntity<TrxSum> getSumPRdByDate(@RequestParam("seller") Integer idSeller,
-                                                @RequestParam("start-dt") String startDt,
-                                                @RequestParam("end-dt") String endDt){
+    public ResultEntity<PrdSumResponse> getSumPRdByDate(@RequestParam("seller") Integer idSeller,
+                                                        @RequestParam("start-dt") String startDt,
+                                                        @RequestParam("end-dt") String endDt){
         try {
             System.out.println("Try Get Sum Prd by Date");
             System.out.println("seller: " + idSeller);
